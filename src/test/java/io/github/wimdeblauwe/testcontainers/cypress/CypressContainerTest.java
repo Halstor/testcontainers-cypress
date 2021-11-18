@@ -3,6 +3,7 @@ package io.github.wimdeblauwe.testcontainers.cypress;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 import java.util.Set;
 import java.util.UUID;
@@ -112,9 +113,12 @@ class CypressContainerTest {
         Consumer<CreateContainerCmd> consumer = createContainerCmdModifiers.iterator().next();
         CreateContainerCmd cmd = mock(CreateContainerCmd.class);
         consumer.accept(cmd);
+        boolean windows = System.getProperty("os.name") != null ?
+            System.getProperty("os.name").toLowerCase().contains("windows") : false;
+        String fileSeparator = FileSystems.getDefault().getSeparator();
         verify(cmd).withEntrypoint("bash",
-                                   "-c",
-                                   "rm -rf cypress/reports/mochawesome && npm install && cypress run --headless");
+                                   "-c", (windows ? "rd /s /q cypress" :
+                                   "rm -rf cypress") + fileSeparator + "reports" + fileSeparator + "mochawesome && npm install && cypress run --headless");
     }
 
     @Test
@@ -158,9 +162,12 @@ class CypressContainerTest {
         Consumer<CreateContainerCmd> consumer = createContainerCmdModifiers.iterator().next();
         CreateContainerCmd cmd = mock(CreateContainerCmd.class);
         consumer.accept(cmd);
+        boolean windows = System.getProperty("os.name") != null ?
+        System.getProperty("os.name").toLowerCase().contains("windows") : false;
+        String fileSeparator = FileSystems.getDefault().getSeparator();
         verify(cmd).withEntrypoint("bash",
-                                   "-c",
-                                   "rm -rf github/wimdeblauwe && npm install && cypress run --headless");
+                                   "-c", (windows ? "rd /s /q github" :
+                                   "rm -rf github") + fileSeparator + "wimdeblauwe && npm install && cypress run --headless");
     }
 
     @Test

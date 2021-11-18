@@ -293,7 +293,9 @@ public class CypressContainer extends GenericContainer<CypressContainer> {
                 throw new IllegalArgumentException("Reports path was /, not allowing to delete everything");
             }
             LOGGER.debug("Removing reports from {}", reportsPathInContainer);
-            builder.append("rm -rf ")
+            boolean windows = System.getProperty("os.name") != null ?
+                System.getProperty("os.name").toLowerCase().contains("windows") : false;
+            builder.append(windows ? "rd /s /q " : "rm -rf ")
                    .append(reportsPathInContainer)
                    .append(" && ");
         }
